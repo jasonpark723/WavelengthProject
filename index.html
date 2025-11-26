@@ -708,9 +708,10 @@
             toggleCluesButton.addEventListener("click", () => {
                 //add a check to make sure the left and right clues are not showing
                 if (document.getElementById("leftClue").style.display === "none" && document.getElementById("rightClue").style.display === "none") {
-                    document.getElementById("leftClue").style.display = "block";
-                    document.getElementById("rightClue").style.display = "block";
-                    toggleCluesButton.textContent = "Hide Clues"
+                    document.getElementById("leftClue").style.display = "flex";
+                    document.getElementById("rightClue").style.display = "flex";
+                    toggleCluesButton.textContent = "Hide Clues";
+
                 } else {
                     document.getElementById("leftClue").style.display = "none";
                     document.getElementById("rightClue").style.display = "none";

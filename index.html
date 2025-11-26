@@ -72,10 +72,16 @@
 
         #leftClue {
             cursor: pointer;
+            user-select: none;
+        }
+        .row {
+            width: 100%;
+            margin-bottom: 8px;
         }
 
         #rightClue {
             cursor: pointer;
+            user-select: none;
         }
 
         .needle-container {
@@ -93,7 +99,7 @@
             position: absolute;
             bottom: 0;
             left: 50%;
-            width: 4px;
+            width: 6px;
             height: 200px;
             background-color: #ff4757;
             transform-origin: bottom center;
@@ -107,6 +113,10 @@
             margin-top: 20px;
             height: 60px;
             /* Adjust this value as needed */
+        }
+        .clues-container.pinned {
+            border: 2px solid #000;
+            border-radius: 8px;
         }
 
         .clue {
@@ -170,6 +180,7 @@
                 justify-content: center;
                 height: auto;
                 min-height: 50px;
+                display: flex;
             }
 
             .bidirectional-arrow {
@@ -448,12 +459,18 @@
             <div class="clue" id="rightClue"></div>
         </div>
         <div class="controls">
-            <button id="toggleButton">Hide Target</button>
-            <button id="nextRoundButton">Next Round</button>
-            <button id="newGameButton" style="background-color: red; color: white">
-                New Game
-            </button>
-
+            <div class="row">
+                <button id="toggleButton">Hide Target</button>
+                <button id="nextRoundButton">Next Round</button>
+                <button id="newCluesButton">New Clues</button>
+                <button id="newGameButton" style="background-color: red; color: white; display: none;">
+                    New Game
+                </button>
+            </div>
+            <div class="row">
+                <button id="toggleCluesButton">Hide Clues</button>
+                <button id="pinCluesButton">Pin Clues</button>
+            </div>
         </div>
         <div id="score"></div>
         <div id="totalScore">Total Score: 0</div>
@@ -463,6 +480,8 @@
             const needle = document.getElementById("needle");
             const targetArea = document.getElementById("targetArea");
             const toggleButton = document.getElementById("toggleButton");
+            const pinCluesButton = document.getElementById("pinCluesButton");
+            const newCluesButton = document.getElementById("newCluesButton");
             const nextRoundButton = document.getElementById("nextRoundButton");
             const newGameButton = document.getElementById("newGameButton");
             const cluesElement = document.getElementById("clues");
@@ -474,6 +493,7 @@
             let isTargetVisible = true;
             let totalScore = 0;
             let canMoveNeedle = false;
+            let iscluePinned = false;
 
             const clues = [
                 ["Bad Company", "Good Company"],
@@ -589,7 +609,6 @@
                 ["Weak Coffee Order", "Alpha Coffee Order"],
                 ["Forgettable Fast-Food Mascot", "Iconic Fast-Food Mascot"],
                 ["Worst Streaming Service UI", "Butter-Smooth Streaming Service UI"],
-                ["Basic Pumpkin Spice Item", "Unhinged Pumpkin Spice Item"],
                 ["Terrible Fantasy Weapon", "Legendary Fantasy Weapon"],
                 ["Annoying Zoom Background", "Peak Zoom Background"],
                 ["Worst Cereal Mascot", "Beloved Cereal Mascot"],
@@ -610,7 +629,19 @@
                 ["Terrible Dad Joke", "Hall-of-Fame Dad Joke"],
                 ["Weak Gamer Tag", "Intimidating Gamer Tag"],
                 ["Lame Office Prank", "Legendary Office Prank"],
-                ["Worst Conspiracy Theory", "Conspiracy Theory That Keeps You Up at Night"]
+                ["Worst Conspiracy Theory", "Conspiracy Theory That Keeps You Up at Night"],
+                ["Korean thing to do","American thing to do"],
+                ["Spicy","Mild"],
+                ["Fast Food","Fine Dining"],
+                ["Alpha","Beta"],
+                ["Luxury","Budget"],
+                ["Party Animal","Homebody"],
+                ["Short","Long"],
+                ["Hardcore","Casual"],
+                ["Perfectionist","Good-Enough Guru"],
+                ["Swipe Left","Swipe Right"],
+                ["Boomer","Gen Z"],
+                ["Lit","Boring"],
             ];
 
             const teamSetup = document.getElementById('teamSetup');
@@ -674,6 +705,38 @@
                 needle.style.transform = `rotate(${Number(needle.style.transform.replace("rotate(", "").replace("deg)", "")) - 5}deg)`;
             });
 
+            toggleCluesButton.addEventListener("click", () => {
+                //add a check to make sure the left and right clues are not showing
+                if (document.getElementById("leftClue").style.display === "none" && document.getElementById("rightClue").style.display === "none") {
+                    document.getElementById("leftClue").style.display = "block";
+                    document.getElementById("rightClue").style.display = "block";
+                    toggleCluesButton.textContent = "Hide Clues"
+                } else {
+                    document.getElementById("leftClue").style.display = "none";
+                    document.getElementById("rightClue").style.display = "none";
+                    toggleCluesButton.textContent = "Show Clues"
+
+                }
+            });
+
+            pinCluesButton.addEventListener("click", () => {
+                iscluePinned = !iscluePinned;
+
+                const container = document.querySelector('.clues-container');
+
+                if (iscluePinned) {
+                    container.classList.add('pinned');
+                    pinCluesButton.textContent = "Unpin Clues"
+                } else {
+                    container.classList.remove('pinned');
+                    pinCluesButton.textContent = "Pin Clues"
+                }
+            });
+
+            newCluesButton.addEventListener("click", () => {
+                setRandomClues();
+            });
+
             // Initialize with 2 teams
             updateTeamInputs();
 
@@ -701,10 +764,12 @@
             }
 
             function setRandomClues() {
-                const randomIndex = Math.floor(Math.random() * clues.length);
-                const [left, right] = clues[randomIndex];
-                document.getElementById("leftClue").textContent = left;
-                document.getElementById("rightClue").textContent = right;
+                if(!iscluePinned){
+                    const randomIndex = Math.floor(Math.random() * clues.length);
+                    const [left, right] = clues[randomIndex];
+                    document.getElementById("leftClue").textContent = left;
+                    document.getElementById("rightClue").textContent = right;
+                }
             }
 
             function calculateScore(angle) {
